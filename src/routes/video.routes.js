@@ -1,4 +1,4 @@
-import {Router} from "expresss"
+import {Router} from "express"
 
 import {
     uploadVideo,
