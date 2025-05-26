@@ -38,7 +38,7 @@ const uploadVideo = asyncHandler(async (req, res) => {
     const userID = req.user?._id
     if(!userID){
         await deleteVideoFromCloudinary(videoFile.public_id);
-        await deleteVideoFromCloudinary(thumbnail.public_id);
+        await deleteFromCloudinary(thumbnail.public_id);
         throw new ApiError(404, "User Id not found. Please ensure you are logged in!")
     }
 
@@ -78,7 +78,7 @@ const uploadVideo = asyncHandler(async (req, res) => {
             await deleteVideoFromCloudinary(videoFile.public_id);
         }
         if (thumbnail) {
-            await deleteVideoFromCloudinary(thumbnail.public_id);
+            await deleteFromCloudinary(thumbnail.public_id);
         }
         throw new ApiError(500, "Something went wrong while uploading the video. Uploaded data and files were deleted")
     }
