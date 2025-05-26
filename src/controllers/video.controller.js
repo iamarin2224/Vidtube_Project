@@ -4,8 +4,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { User } from "../models/users.models.js";
 import { Video } from "../models/videos.models.js";
 import { uploadOnCloudinary, deleteFromCloudinary, extractPublicId, deleteVideoFromCloudinary } from "../utils/cloudinary.js"
-import jwt from "jsonwebtoken";
-import mongoose from "mongoose";
+
 
 //upload video
 const uploadVideo = asyncHandler(async (req, res) => {
