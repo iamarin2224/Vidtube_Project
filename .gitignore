@@ -120,4 +120,7 @@ dist
 ## ignoring target file
 target/
 
+## ignoring .DS_Store
+.DS_Store
+
 # End of https://mrkandreev.name/snippets/gitignore-generator/#Node,Java-Web
