@@ -2,7 +2,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { User } from "../models/users.models.js";
-import { uploadOnCloudinary, deleteFromCloudinary } from "../utils/cloudinary.js"
+import { uploadOnCloudinary, deleteFromCloudinary, extractPublicId } from "../utils/cloudinary.js"
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
 
@@ -285,6 +285,10 @@ const updateAvatar = asyncHandler(async (req, res) => {
         throw new ApiError(500, "Something went wrong while uploading avatar")
     }
 
+    const cloudinaryUrl = (await User.findById(req.user?._id))?.avatar;
+    const publicId = extractPublicId(cloudinaryUrl);
+    await deleteFromCloudinary(publicId);
+
     const user = await User.findByIdAndUpdate(
         req.user?._id,
         {
@@ -310,6 +314,10 @@ const updateCoverImage = asyncHandler(async (req, res) => {
     if(!coverImage){
         throw new ApiError(500, "Something went wrong while uploading cover image")
     }
+
+    const cloudinaryUrl = (await User.findById(req.user?._id))?.coverImage;
+    const publicId = extractPublicId(cloudinaryUrl);
+    await deleteFromCloudinary(publicId);
 
     const user = await User.findByIdAndUpdate(
         req.user?._id,

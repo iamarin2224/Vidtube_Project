@@ -32,6 +32,23 @@ const uploadOnCloudinary = async (localFilePath) => {
     }
 }
 
+const  extractPublicId = (cloudinaryUrl) => {
+  // Step 1: Remove query params if any
+  const urlWithoutParams = cloudinaryUrl.split('?')[0];
+
+  // Step 2: Split the URL by '/'
+  const parts = urlWithoutParams.split('/');
+
+  // Step 3: Get the last part (which is the filename with extension)
+  const filename = parts[parts.length - 1]; // e.g., 'nm1hq0jksuqwpb6u9m3t.jpg'
+
+  // Step 4: Remove the extension (e.g., .jpg, .png, etc.)
+  const publicId = filename.replace(/\.[^/.]+$/, '');
+
+  return publicId;
+}
+
+
 const deleteFromCloudinary = async (publicId) => {
     try {
         const result = cloudinary.uploader.destroy(publicId)
@@ -42,4 +59,4 @@ const deleteFromCloudinary = async (publicId) => {
     }
 }
 
-export {uploadOnCloudinary, deleteFromCloudinary}
+export {uploadOnCloudinary, deleteFromCloudinary, extractPublicId}
