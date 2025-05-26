@@ -2,6 +2,7 @@ import {Router} from "express"
 
 import {
     uploadVideo,
+    viewVideo,
 } from "../controllers/video.controller.js"
 
 import { upload } from "../middlewares/multer.middleware.js";
@@ -23,5 +24,7 @@ router.route("/upload-video").post(
     verifyJWT,
     uploadVideo
 )
+
+router.route("/view/:videoId").patch(verifyJWT, viewVideo)
 
 export default router

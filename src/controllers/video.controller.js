@@ -86,6 +86,43 @@ const uploadVideo = asyncHandler(async (req, res) => {
 
 })
 
+const viewVideo = asyncHandler(async (req, res) => {
+
+    const {videoId} = req.params
+
+    const userID = req.user?._id
+    if(!userID){
+        throw new ApiError(404, "User Id not found. Please log in to view")
+    }
+
+    const user = await User.findById(userID)
+    if (!user){
+        throw new ApiError(404, "User not found in database")
+    }
+
+    const alreadyWatched = user.watchHistory.includes(videoId)
+    if(!alreadyWatched){
+        user.watchHistory.push(videoId);
+        await user.save({validateBeforeSave: false})
+    }
+
+    const video = await Video.findByIdAndUpdate(
+        videoId,
+        {
+            $inc: { views: 1 }
+        },
+        {new: true}
+    ).populate("owner", "username avatar")
+
+    if(!video){
+        throw new ApiError(404, "Video not found in database")
+    }
+
+    return res.status(200).json(new ApiResponse(201, video, "Video viewed successfully"))    
+
+})
+
 export {
-    uploadVideo
+    uploadVideo,
+    viewVideo
 }
