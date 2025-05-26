@@ -20,6 +20,7 @@ router.route("/upload-video").post(
             maxCount: 1
         }
     ]),
+    verifyJWT,
     uploadVideo
 )
 
