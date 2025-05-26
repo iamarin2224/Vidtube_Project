@@ -6,7 +6,6 @@ import { Video } from "../models/videos.models.js";
 import { uploadOnCloudinary, deleteFromCloudinary, extractPublicId, deleteVideoFromCloudinary } from "../utils/cloudinary.js"
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
-import { use } from "react";
 
 //upload video
 const uploadVideo = asyncHandler(async (req, res) => {
