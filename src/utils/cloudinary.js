@@ -51,7 +51,7 @@ const deleteFromCloudinary = async (publicId) => {
     }
 }
 
-const deleteFromVideoCloudinary = async (publicId) => {
+const deleteVideoFromCloudinary = async (publicId) => {
     try {
         const result = cloudinary.uploader.destroy(publicId, {
             resource_type: "video"
@@ -63,4 +63,4 @@ const deleteFromVideoCloudinary = async (publicId) => {
     }
 }
 
-export {uploadOnCloudinary, deleteFromCloudinary, deleteFromVideoCloudinary, extractPublicId}
+export {uploadOnCloudinary, deleteFromCloudinary, deleteVideoFromCloudinary, extractPublicId}
