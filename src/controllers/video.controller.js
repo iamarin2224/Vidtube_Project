@@ -4,6 +4,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { User } from "../models/users.models.js";
 import { Video } from "../models/videos.models.js";
 import { uploadOnCloudinary, deleteFromCloudinary, extractPublicId, deleteVideoFromCloudinary } from "../utils/cloudinary.js"
+import mongoose from "mongoose";
 
 
 //upload video
@@ -268,11 +269,44 @@ const deleteVideo = asyncHandler(async (req, res) => {
 
 })
 
+const getUploadedVideos = asyncHandler(async (req, res) => {
+
+    const userID = req.user?._id
+    if(!userID){
+        throw new ApiError(404, "User Id not found. Please ensure you are logged in!")
+    }
+    const user = await User.findById(userID)
+    if (!user){
+        throw new ApiError(404, "User not found in database")
+    }
+
+    const videos = await Video.aggregate([
+        {
+            $match: {
+                owner: new mongoose.Types.ObjectId(user._id)
+            }
+        },
+        {
+            $project: {
+                title: 1,
+                description: 1,
+                videoFile: 1,
+                thumbnail: 1,
+                duration: 1,
+                views: 1
+            }
+        }
+    ])
+
+    return res.status(200).json(new ApiResponse(200, videos, "List of uploaded videos fetched successfully"))
+})
+
 export {
     uploadVideo,
     getVideoDetails,
     viewVideo,
     updateVideoDetails,
     updateVideoThumbnail,
-    deleteVideo
+    deleteVideo,
+    getUploadedVideos
 }
