@@ -232,10 +232,47 @@ const updateVideoThumbnail = asyncHandler(async (req, res) => {
 
 })
 
+const deleteVideo = asyncHandler(async (req, res) => {
+
+    const {videoId} = req.params
+    if(!videoId){
+        throw new ApiError(404, "Video Id not found")
+    }
+    const video = await Video.findById(videoId)
+    if (!video){
+        throw new ApiError(404, "Video not found in database")
+    }
+
+    const userID = req.user?._id
+    if(!userID){
+        throw new ApiError(404, "User Id not found. Please ensure you are logged in!")
+    }
+    const user = await User.findById(userID)
+    if (!user){
+        throw new ApiError(404, "User not found in database")
+    }
+
+    if (user._id.toString() !== video.owner.toString()) {
+        throw new ApiError(401, "User not authorized, video can only be deleted by owner")
+    }
+
+    const videoFilePublicId = extractPublicId(video.videoFile);
+    await deleteVideoFromCloudinary(videoFilePublicId)
+
+    const thumbnailPublicId = extractPublicId(video.thumbnail);
+    await deleteFromCloudinary(thumbnailPublicId)
+
+    await Video.findByIdAndDelete(video._id)
+    
+    return res.status(200).json(new ApiResponse(200, {}, "Video deleted successfully")) 
+
+})
+
 export {
     uploadVideo,
     getVideoDetails,
     viewVideo,
     updateVideoDetails,
     updateVideoThumbnail,
+    deleteVideo
 }

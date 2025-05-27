@@ -5,7 +5,8 @@ import {
     getVideoDetails,
     viewVideo,
     updateVideoDetails,
-    updateVideoThumbnail
+    updateVideoThumbnail,
+    deleteVideo
 } from "../controllers/video.controller.js"
 
 import { upload } from "../middlewares/multer.middleware.js";
@@ -29,5 +30,7 @@ router.route("/view/:videoId").patch(verifyJWT, viewVideo)
 router.route("/update/:videoId").patch(verifyJWT, updateVideoDetails)
 
 router.route("/update/thumbnail/:videoId").patch(verifyJWT, upload.single("thumbnail"), updateVideoThumbnail) 
+
+router.route("/delete/:videoId").delete(verifyJWT, deleteVideo)
 
 export default router
