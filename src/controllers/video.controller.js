@@ -8,6 +8,7 @@ import { uploadOnCloudinary, deleteFromCloudinary, extractPublicId, deleteVideoF
 
 //upload video
 const uploadVideo = asyncHandler(async (req, res) => {
+
     const {title, description} = req.body
     if (!(title && description)){
         throw new ApiError(400, "Title and Description are required")
@@ -17,6 +18,15 @@ const uploadVideo = asyncHandler(async (req, res) => {
     const thumbnailFilePath = req.files?.thumbnail?.[0]?.path;
     if (!(videoFilePath && thumbnailFilePath)){
         throw new ApiError(400, "Video file and thumbnail are required");
+    }
+
+    const userID = req.user?._id
+    if(!userID){
+        throw new ApiError(404, "User Id not found. Please ensure you are logged in!")
+    }
+    const user = await User.findById(req.user?._id)
+    if (!user){
+        throw new ApiError(404, "User not found in database")
     }
 
     let videoFile;
@@ -33,18 +43,6 @@ const uploadVideo = asyncHandler(async (req, res) => {
     } catch (error) {
         console.log("Error in uploading thumbnail", error);
         throw new ApiError(500, "Failed to upload thumbnail")
-    }
-
-    const userID = req.user?._id
-    if(!userID){
-        await deleteVideoFromCloudinary(videoFile.public_id);
-        await deleteFromCloudinary(thumbnail.public_id);
-        throw new ApiError(404, "User Id not found. Please ensure you are logged in!")
-    }
-
-    const user = await User.findById(req.user?._id)
-    if (!user){
-        throw new ApiError(404, "User not found in database")
     }
     
     let video;
