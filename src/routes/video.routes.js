@@ -2,6 +2,7 @@ import {Router} from "express"
 
 import {
     uploadVideo,
+    getVideoDetails,
     viewVideo,
     updateVideoDetails,
     updateVideoThumbnail
@@ -26,6 +27,8 @@ router.route("/upload-video").post(
     verifyJWT,
     uploadVideo
 )
+
+router.route("/get/:videoId").get(getVideoDetails)
 
 router.route("/view/:videoId").patch(verifyJWT, viewVideo)
 

@@ -120,6 +120,18 @@ const viewVideo = asyncHandler(async (req, res) => {
 
 })
 
+const getVideoDetails = asyncHandler(async (req, res) => {
+    const {videoId} = req.params
+    if(!videoId){
+        throw new ApiError(404, "Video Id not found")
+    }
+    const video = await Video.findById(videoId)
+    if (!video){
+        throw new ApiError(404, "Video not found in database")
+    }
+    return res.status(200).json(new ApiResponse(200, video, "Video data updated successfully")) 
+})
+
 const updateVideoDetails = asyncHandler(async (req, res) => {
 
     const {title, description} = req.body
@@ -222,7 +234,8 @@ const updateVideoThumbnail = asyncHandler(async (req, res) => {
 
 export {
     uploadVideo,
+    getVideoDetails,
     viewVideo,
     updateVideoDetails,
-    updateVideoThumbnail
+    updateVideoThumbnail,
 }
