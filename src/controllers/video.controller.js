@@ -24,7 +24,7 @@ const uploadVideo = asyncHandler(async (req, res) => {
     if(!userID){
         throw new ApiError(404, "User Id not found. Please ensure you are logged in!")
     }
-    const user = await User.findById(req.user?._id)
+    const user = await User.findById(userID)
     if (!user){
         throw new ApiError(404, "User not found in database")
     }
@@ -120,7 +120,109 @@ const viewVideo = asyncHandler(async (req, res) => {
 
 })
 
+const updateVideoDetails = asyncHandler(async (req, res) => {
+
+    const {title, description} = req.body
+    if (!title || !description){
+        throw new ApiError(404, "Title and description are reuired")
+    }
+
+    const {videoId} = req.params
+    if(!videoId){
+        throw new ApiError(404, "Video Id not found")
+    }
+    const video = await Video.findById(videoId)
+    if (!video){
+        throw new ApiError(404, "Video not found in database")
+    }
+
+    const userID = req.user?._id
+    if(!userID){
+        throw new ApiError(404, "User Id not found. Please ensure you are logged in!")
+    }
+    const user = await User.findById(userID)
+    if (!user){
+        throw new ApiError(404, "User not found in database")
+    }
+
+    // console.log("UserId:", user._id, "VideoOwnerId:", video.owner);
+
+    if (user._id.toString() !== video.owner.toString()) {
+        throw new ApiError(401, "User not authorized, video details can only be changed by owner")
+    }
+
+    const newVideo = await Video.findByIdAndUpdate(
+        video._id,
+        {
+            $set:   {
+                title,
+                description
+            }
+        },
+        {new: true}
+    )
+
+    return res.status(200).json(new ApiResponse(200, newVideo, "Video data updated successfully")) 
+
+})
+
+const updateVideoThumbnail = asyncHandler(async (req, res) => {
+
+    const thumbnailFilePath = req.file?.path
+    if(!thumbnailFilePath){
+        throw new ApiError(404, "Thumbnail file is required")
+    }
+
+    const {videoId} = req.params
+    if(!videoId){
+        throw new ApiError(404, "Video Id not found")
+    }
+    const video = await Video.findById(videoId)
+    if (!video){
+        throw new ApiError(404, "Video not found in database")
+    }
+
+    const userID = req.user?._id
+    if(!userID){
+        throw new ApiError(404, "User Id not found. Please ensure you are logged in!")
+    }
+    const user = await User.findById(userID)
+    if (!user){
+        throw new ApiError(404, "User not found in database")
+    }
+
+    if (user._id.toString() !== video.owner.toString()) {
+        throw new ApiError(401, "User not authrorized, video details can only be changed by owner")
+    }
+
+    let thumbnail;
+    try {
+        thumbnail = await uploadOnCloudinary(thumbnailFilePath)
+    } catch (error) {
+        console.log("Error in uploading thumbnail", error);
+        throw new ApiError(500, "Failed to upload thumbnail")
+    }
+
+    const publicId = extractPublicId(video.thumbnail);
+    await deleteFromCloudinary(publicId)
+
+    const newVideo = await Video.findByIdAndUpdate(
+        video._id,
+        {
+            $set:   {
+                thumbnail: thumbnail.secure_url
+            }
+        },
+        {new: true}
+    )
+
+    return res.status(200).json(new ApiResponse(200, newVideo, "Video thumbnail updated successfully")) 
+
+})
+
 export {
     uploadVideo,
-    viewVideo
+    viewVideo,
+    updateVideoDetails,
+    updateVideoThumbnail
 }
