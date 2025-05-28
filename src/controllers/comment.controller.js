@@ -178,9 +178,53 @@ const deleteComment = asyncHandler(async (req, res) => {
 
 })
 
+const getAllComments = asyncHandler(async (req, res) => {
+
+    const {type, id} = req.params
+    if(!type || !id){
+        throw new ApiError(400, "Both type and id are required")
+    }
+
+    let comments;
+
+    if (type==="video"){
+        const video = await Video.findById(id)
+        if (!video){
+            throw new ApiError(404, "Video not found in database");
+        }
+        comments = await Comment.aggregate([
+            {
+                $match: {
+                    videoId: video._id
+                }
+            }
+        ])
+    }
+
+    else if (type==="tweet"){
+        const tweet = await Tweet.findById(id)
+        if (!tweet){
+            throw new ApiError(404, "Tweet not found in database");
+        }
+        comments = await Comment.aggregate([
+            {
+                $match: {
+                    tweetId: tweet._id
+                }
+            }
+        ])
+    }
+
+    else throw new ApiError(400, "Invalid content type");
+
+    return res.status(200).json(new ApiResponse(200, comments, "All comments fetched successfully"))
+
+})
+
 export {
     commentOnVideo,
     commentOnTweet,
     editComment,
-    deleteComment
+    deleteComment,
+    getAllComments
 }
