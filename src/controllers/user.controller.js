@@ -368,7 +368,7 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
             },
             {
                 $addFields: { //these are not saved in the database
-                    subscribersCount: {$size: "$subsribers"},
+                    subscribersCount: {$size: "$subscribers"},
                     subscribedChannelsCount: {$size: "$subscriptionList"},
                     isSubsribed: {
                         $cond: {
