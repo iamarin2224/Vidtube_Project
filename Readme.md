@@ -109,8 +109,6 @@ The app uses the following environment variables:
 * `CLOUDINARY_CLOUD_NAME`
 * `CORS_ORIGIN`
 
-(*Do not commit secrets to version control*)
-
 ---
 
 ## 📌 Notes
